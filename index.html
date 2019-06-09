@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<script src="js/jquery-3.1.1.js"></script>
+	<script src="js/bootstrap.js"></script>
+	<script src="js/adapter.js"></script>
+	<script src="js/platform.js"></script>
+	<script src="js/h5splayer.js"></script>
+	<script src="js/h5splayerhelper.js"></script>
+
+<link rel = "stylesheet" type = "text/css" href = "css/h5splayer.css" />
+    <title></title>
+    <script type="text/javascript">
+    	var v1;
+		var h5shost = '192.168.100.108:8080';
+		var strToken = 'token1';
+		var conf1 = {
+			videoid:'h5sVideo1',
+			protocol: 'http:', //'http:' or 'https:'
+			host: h5shost, //'localhost:8080'
+			rootpath:'/', // '/'
+			token:strToken,
+			hlsver:'v1', //v1 is for ts, v2 is for fmp4
+			session:'c1782caf-b670-42d8-ba90-2244d0b0ee83' //session got from login
+		};
+   		document.addEventListener('plusready', function(){
+   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。"
+		console.log(platform.name); // 'Safari'
+		console.log(platform.version); // '11.1'
+		console.log(platform.product); // 'iPad'
+		console.log(platform.manufacturer); // 'Apple'
+		console.log(platform.layout); // 'WebKit'
+		console.log(platform.os.family); // 'iOS'
+		console.log(platform.description);// 'Safari 11.1 on Apple iPad (iOS 11.0)'
+
+		if (H5siOS() === true
+		|| H5sSafariBrowser() === true)
+		{
+			$('#h5sVideo1').prop("controls", true);
+		}
+		if (H5siOS() === true)
+		{
+			v1 = new H5sPlayerRTC(conf1);
+			$('#h5siframe1').get(0).src = "http://" + h5shost + "/rtc.html?autoplay=true"
+		}else
+		{
+			$('#h5siframe1').get(0).src = "http://" + h5shost + "/ws.html?autoplay=true"
+			v1 = new H5sPlayerWS(conf1);
+		}
+		v1.connect();
+		
+   		});
+   		
+		function Start()
+		{
+			if(v1 != null)
+			{
+				v1.disconnect();
+				delete v1;
+				v1 = null;
+			}
+			if (H5siOS() === true)
+			{
+				v1 = new H5sPlayerRTC(conf1);
+			}else 
+			{
+				v1 = new H5sPlayerWS(conf1);
+			}
+			
+			console.log(v1);
+			v1.connect();
+		}
+
+		function Stop()
+		{
+			v1.disconnect();
+			delete v1;
+			v1 = null;
+			$('#h5sVideo1').get(0).load();
+		}
+		function FullScreen()
+		{
+			var elem = $('#h5sVideo1').get(0);
+			if (elem.requestFullscreen) {
+				elem.requestFullscreen();
+			} else if (elem.webkitRequestFullscreen) {
+				elem.webkitRequestFullscreen();
+			} else if (elem.mozRequestFullScreen) {
+				elem.mozRequestFullScreen();
+			} else if (elem.msRequestFullscreen) {
+				elem.msRequestFullscreen();
+			}
+
+			//screen.lockOrientation("landscape"); 
+		}
+    </script>
+</head>
+<body>
+<div class="row">
+<iframe id="h5siframe1" marginWidth=0 marginHeight=0 frameborder="no" border="0"  width="100%" height="240px"></iframe>
+</div>
+<div class="row"> 
+    <video class="h5video1" id="h5sVideo1"   poster="null"   webkit-playsinline playsinline>
+    </video>
+</div>
+
+<button type="button" onclick="Start()">Play</button>
+<button type="button" onclick="Stop()">Stop</button>
+<button type="fullscreen" onclick="FullScreen()">FullScreen</button>
+<div class="row">
+	<!-- Set poster to null and let remove the default poster -->
+    <video class="h5video1" id="h5sVideo2"   poster="null"  webkit-playsinline playsinline>
+    </video>
+</div>
+</body>
+</html>
