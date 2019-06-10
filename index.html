@@ -43,13 +43,14 @@
 		if (H5siOS() === true)
 		{
 			v1 = new H5sPlayerRTC(conf1);
-			$('#h5siframe1').get(0).src = "http://" + h5shost + "/rtc.html?autoplay=true"
+			$('#h5siframe1').get(0).src = "http://" + h5shost + "/rtc.html"
 		}else
 		{
 			$('#h5siframe1').get(0).src = "http://" + h5shost + "/ws.html?autoplay=true"
 			v1 = new H5sPlayerWS(conf1);
+			v1.connect();
 		}
-		v1.connect();
+		
 		
    		});
    		
@@ -93,7 +94,8 @@
 				elem.msRequestFullscreen();
 			}
 
-			//screen.lockOrientation("landscape"); 
+			//screen.lockOrientation("portrait");
+			 //screen.orientation.lock("landscape");
 		}
     </script>
 </head>
