@@ -14,6 +14,7 @@
     <title></title>
     <script type="text/javascript">
     	var v1;
+		var v2;
 		var h5shost = '192.168.100.108:8080';
 		var strToken = 'token1';
 		var conf1 = {
@@ -25,36 +26,75 @@
 			hlsver:'v1', //v1 is for ts, v2 is for fmp4
 			session:'c1782caf-b670-42d8-ba90-2244d0b0ee83' //session got from login
 		};
+		var conf2 = {
+			videoid:'h5sVideo2',
+			protocol: 'http:', //'http:' or 'https:'
+			host: h5shost, //'localhost:8080'
+			rootpath:'/', // '/'
+			token:strToken,
+			hlsver:'v1', //v1 is for ts, v2 is for fmp4
+			session:'c1782caf-b670-42d8-ba90-2244d0b0ee83' //session got from login
+		};
    		document.addEventListener('plusready', function(){
-   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。"
-		console.log(platform.name); // 'Safari'
-		console.log(platform.version); // '11.1'
-		console.log(platform.product); // 'iPad'
-		console.log(platform.manufacturer); // 'Apple'
-		console.log(platform.layout); // 'WebKit'
-		console.log(platform.os.family); // 'iOS'
-		console.log(platform.description);// 'Safari 11.1 on Apple iPad (iOS 11.0)'
+			console.log(platform.name); // 'Safari'
+			console.log(platform.version); // '11.1'
+			console.log(platform.product); // 'iPad'
+			console.log(platform.manufacturer); // 'Apple'
+			console.log(platform.layout); // 'WebKit'
+			console.log(platform.os.family); // 'iOS'
+			console.log(platform.description);// 'Safari 11.1 on Apple iPad (iOS 11.0)'
 
-		if (H5siOS() === true
-		|| H5sSafariBrowser() === true)
-		{
-			$('#h5sVideo1').prop("controls", true);
-		}
-		if (H5siOS() === true)
-		{
-			v1 = new H5sPlayerRTC(conf1);
-			$('#h5siframe1').get(0).src = "http://" + h5shost + "/rtc.html"
-		}else
-		{
-			$('#h5siframe1').get(0).src = "http://" + h5shost + "/ws.html?autoplay=true"
-			v1 = new H5sPlayerWS(conf1);
-			v1.connect();
-		}
-		
+			if (H5siOS() === true
+			|| H5sSafariBrowser() === true)
+			{
+				$('#h5sVideo1').prop("controls", true);
+			}
+			if (H5siOS() === true)
+			{
+				v1 = new H5sPlayerRTC(conf1);
+				$('#h5siframe1').get(0).src = "http://" + h5shost + "/rtc.html"
+			}else
+			{
+				$('#h5siframe1').get(0).src = "http://" + h5shost + "/ws.html?autoplay=true"
+				v1 = new H5sPlayerWS(conf1);
+				v1.connect();
+			}
+			
 		
    		});
    		
-		function Start()
+	
+    </script>
+</head>
+<body>
+<div class="row">
+<iframe id="h5siframe1" marginWidth=0 marginHeight=0 frameborder="no" border="0"  width="100%" height="240px"></iframe>
+</div>
+<div class="row"> 
+    <video class="h5video1" id="h5sVideo1"   poster="null"   webkit-playsinline playsinline>
+    </video>
+</div>
+
+<button type="button" onclick="Start1()">Play</button>
+<button type="button" onclick="Stop1()">Stop</button>
+<button type="fullscreen" onclick="FullScreen1()">FullScreen</button>
+<div class="row">
+	<!-- Set poster to null and let remove the default poster -->
+    <video class="h5video1 h5videoCanvas" id="h5sVideo2"   poster="null"  webkit-playsinline playsinline>
+    </video>
+	<canvas class="h5Canvas" id="h5sCanvas1"></canvas>
+</div>
+<button type="button" onclick="Start2()">Play</button>
+<button type="button" onclick="Stop2()">Stop</button>
+<button type="fullscreen" onclick="FullScreen2()">FullScreen</button>
+<div class="row">
+	<!-- Set poster to null and let remove the default poster -->
+    <video class="h5video1" id="h5sVideo3"   poster="null"  webkit-playsinline playsinline>
+    </video>
+</div>
+</body>
+<script type="text/javascript">
+		function Start1()
 		{
 			if(v1 != null)
 			{
@@ -74,14 +114,14 @@
 			v1.connect();
 		}
 
-		function Stop()
+		function Stop1()
 		{
 			v1.disconnect();
 			delete v1;
 			v1 = null;
 			$('#h5sVideo1').get(0).load();
 		}
-		function FullScreen()
+		function FullScreen1()
 		{
 			var elem = $('#h5sVideo1').get(0);
 			if (elem.requestFullscreen) {
@@ -97,24 +137,80 @@
 			//screen.lockOrientation("portrait");
 			 //screen.orientation.lock("landscape");
 		}
-    </script>
-</head>
-<body>
-<div class="row">
-<iframe id="h5siframe1" marginWidth=0 marginHeight=0 frameborder="no" border="0"  width="100%" height="240px"></iframe>
-</div>
-<div class="row"> 
-    <video class="h5video1" id="h5sVideo1"   poster="null"   webkit-playsinline playsinline>
-    </video>
-</div>
+		
+		
+		//below is a canvas based video player
+		var video = $('#h5sVideo2')[0];
+		var canvas = $('#h5sCanvas1')[0];
+		var ctx = canvas.getContext('2d');
+		var framesPerSecond = 25;
+		var animationFrame;
+		ctx.imageSmoothingEnabled = true;
+		ctx.webkitImageSmoothingEnabled = true;
+		ctx.mozImageSmoothingEnabled = true;
+		var can2 = document.createElement('canvas');
+		var ctx2 = can2.getContext('2d');
 
-<button type="button" onclick="Start()">Play</button>
-<button type="button" onclick="Stop()">Stop</button>
-<button type="fullscreen" onclick="FullScreen()">FullScreen</button>
-<div class="row">
-	<!-- Set poster to null and let remove the default poster -->
-    <video class="h5video1" id="h5sVideo2"   poster="null"  webkit-playsinline playsinline>
-    </video>
-</div>
-</body>
+		function loop() {  
+			if (video.videoWidth == 0 || video.videoHeight == 0)
+			{
+				animationFrame = requestAnimationFrame(loop);
+				return;
+			}
+			canvas.width = video.videoWidth/4;
+			canvas.height = video.videoHeight/4;
+			can2.width = video.videoWidth;
+			can2.height = video.videoHeight;
+			ctx2.drawImage(video, 0, 0, video.videoWidth, video.videoWidth, 0, 0, video.videoWidth/2, video.videoWidth/2);
+			ctx2.drawImage(can2, 0, 0, video.videoWidth/2, video.videoWidth/2, 0, 0, video.videoWidth/4, video.videoWidth/4); 
+			//ctx.rotate(50 * Math.PI / 180);
+			ctx.drawImage(can2, 0, 0, video.videoWidth/4, video.videoHeight/4, 0, 0, canvas.width, canvas.height);
+			
+			//console.log("=====", video.videoWidth, video.videoHeight)
+			animationFrame = requestAnimationFrame(loop);
+		}
+		
+		function Start2()
+		{
+			if(v2 != null)
+			{
+				v2.disconnect();
+				delete v2;
+				v2 = null;
+			}
+			if (H5siOS() === true)
+			{
+				v2 = new H5sPlayerRTC(conf2);
+			}else 
+			{
+				v2 = new H5sPlayerWS(conf2);
+			}
+			
+			console.log(v2);
+			v2.connect();
+			loop();
+		}
+
+		function Stop2()
+		{
+			v2.disconnect();
+			delete v2;
+			v2 = null;
+			$('#h5sVideo2').get(0).load();
+		}
+		function FullScreen2()
+		{
+			var elem = $('#h5sCanvas1').get(0);
+			if (elem.requestFullscreen) {
+				elem.requestFullscreen();
+			} else if (elem.webkitRequestFullscreen) {
+				elem.webkitRequestFullscreen();
+			} else if (elem.mozRequestFullScreen) {
+				elem.mozRequestFullScreen();
+			} else if (elem.msRequestFullscreen) {
+				elem.msRequestFullscreen();
+			}
+		}	
+	
+</script>
 </html>
